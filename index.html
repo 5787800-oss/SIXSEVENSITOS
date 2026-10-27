@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sabor Local — Toma tu pedido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBF9F2;
+    --paper-shadow: #E9E4D5;
+    --ink: #1F2A22;
+    --ink-soft: #55604F;
+    --green: #2F6F4E;
+    --green-dark: #1F4D36;
+    --chili: #C1440E;
+    --line: #D8D2BE;
+    --bg: #16241C;
+    --bg-2: #1E3327;
+    --focus: #E8A23B;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 20% 0%, var(--bg-2) 0%, transparent 55%),
+      radial-gradient(circle at 85% 90%, var(--bg-2) 0%, transparent 50%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 28px 16px 60px;
+  }
+
+  @media (min-width: 640px) {
+    body { align-items: center; padding: 40px 16px; }
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .eyebrow {
+    text-align: center;
+    color: #C9D9CE;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+
+  /* ---- Ticket card ---- */
+  .ticket {
+    position: relative;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 30px 26px 26px;
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,0.55);
+    -webkit-mask-image:
+      radial-gradient(circle 7px at 16px 0, transparent 7px, black 7.5px),
+      linear-gradient(black, black);
+    -webkit-mask-size: 32px 100%, 100% 100%;
+    -webkit-mask-repeat: repeat-x, no-repeat;
+    -webkit-mask-position: top left, top left;
+    -webkit-mask-composite: source-in;
+            mask-image:
+      radial-gradient(circle 7px at 16px 0, transparent 7px, black 7.5px),
+      linear-gradient(black, black);
+            mask-size: 32px 100%, 100% 100%;
+            mask-repeat: repeat-x, no-repeat;
+            mask-position: top left, top left;
+            mask-composite: intersect;
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 96%,
+      93% 100%, 86% 96%, 79% 100%, 72% 96%, 65% 100%,
+      58% 96%, 51% 100%, 44% 96%, 37% 100%, 30% 96%,
+      23% 100%, 16% 96%, 9% 100%, 2% 96%, 0% 100%
+    );
+    padding-bottom: 44px;
+  }
+
+  .ticket__head {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 2px dashed var(--line);
+    margin-bottom: 20px;
+  }
+
+  .ticket__logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: var(--green-dark);
+  }
+
+  .ticket__tagline {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin: 6px 0 0;
+    letter-spacing: 0.04em;
+  }
+
+  .ticket__order-no {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--green-dark);
+    background: rgba(47,111,78,0.09);
+    border: 1px dashed var(--green);
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---- Form ---- */
+  .field {
+    margin-bottom: 18px;
+  }
+
+  /* Nuevo contenedor en cuadrícula para agrupar Menú y Cantidad */
+  .field-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  
+  .field-row .field {
+    margin-bottom: 0;
+  }
+
+  .field label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 7px;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 12px;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2355604F' stroke-width='1.6' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 34px;
+  }
+
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px rgba(232,162,59,0.28);
+  }
+
+  .field small.error-text {
+    display: none;
+    margin-top: 6px;
+    color: var(--chili);
+    font-size: 12.5px;
+  }
+
+  .field.invalid input,
+  .field.invalid select {
+    border-color: var(--chili);
+  }
+
+  .field.invalid small.error-text {
+    display: block;
+  }
+
+  .divider {
+    border: none;
+    border-top: 2px dashed var(--line);
+    margin: 22px 0 20px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--green);
+    border: none;
+    border-radius: 6px;
+    padding: 15px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .submit-btn:hover { background: var(--green-dark); }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .submit-btn:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .submit-btn[disabled] {
+    background: #A9B7AC;
+    cursor: not-allowed;
+  }
+
+  .submit-btn .spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.5);
+    border-top-color: #fff;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .submit-btn.loading .btn-label { display: none; }
+  .submit-btn.loading .spinner { display: block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- Status message ---- */
+  .status {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    display: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .status.visible { display: block; }
+
+  .status.success {
+    background: rgba(47,111,78,0.1);
+    border: 1px solid var(--green);
+    color: var(--green-dark);
+  }
+
+  .status.error {
+    background: rgba(193,68,14,0.08);
+    border: 1px solid var(--chili);
+    color: var(--chili);
+  }
+
+  .status strong { display: block; margin-bottom: 2px; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .foot-note {
+    text-align: center;
+    color: #93A498;
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    margin-top: 18px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .submit-btn, .spinner { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="eyebrow">Pedido a la carta</p>
+
+  <form class="ticket" id="pedido-form" novalidate>
+    <div class="ticket__head">
+      <h1 class="ticket__logo">SABOR LOCAL</h1>
+      <p class="ticket__tagline">especialidad en café helado &middot; hecho al momento</p>
+      <span class="ticket__order-no" id="order-no">PEDIDO Nº ----</span>
+    </div>
+
+    <div class="field" id="field-nombre">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" autocomplete="name" required>
+      <small class="error-text">Escribe tu nombre para continuar.</small>
+    </div>
+
+    <div class="field" id="field-correo">
+      <label for="correo">Correo electrónico</label>
+      <input type="email" id="correo" name="correo" placeholder="tucorreo@ejemplo.com" autocomplete="email" required>
+      <small class="error-text">Ingresa un correo válido.</small>
+    </div>
+
+    <!-- Nueva estructura de 2 columnas para bebida y cantidad -->
+    <div class="field-row">
+      <div class="field" id="field-item">
+        <label for="item">Elige tu platillo</label>
+        <select id="item" name="item" required>
+          <option value="" disabled selected>Selecciona...</option>
+          <option value="Maruchan Greñuda">Maruchan Greñuda</option>
+          <option value="maruchan loca">maruchan loca</option>
+          <option value="Chili maruchan">Chili maruchan</option>
+          <option value="Maruchan con queso">Maruchan con queso</option>
+          <option value="maruchan esquite">maruchan esquite</option>
+        </select>
+        <small class="error-text">Falta la bebida.</small>
+      </div>
+
+      <div class="field" id="field-cantidad">
+        <label for="cantidad">Cantidad</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" max="20" value="1" required>
+        <small class="error-text">Mín. 1</small>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <button type="submit" class="submit-btn" id="submit-btn">
+      <span class="btn-label">Enviar pedido</span>
+      <span class="spinner"></span>
+    </button>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </form>
+
+  <p class="foot-note">gracias por preferirnos</p>
+</div>
+
+<script>
+  const API_URL = 'https://sixsevencitos.onrender.com/pedido';
+
+  const form = document.getElementById('pedido-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const statusBox = document.getElementById('status');
+  const orderNoLabel = document.getElementById('order-no');
+
+  const fields = {
+    nombre: document.getElementById('field-nombre'),
+    correo: document.getElementById('field-correo'),
+    item: document.getElementById('field-item'),
+    cantidad: document.getElementById('field-cantidad') // Agregado a la validación
+  };
+
+  // Genera un número de pedido "decorativo"
+  orderNoLabel.textContent = 'PEDIDO Nº ' + String(Math.floor(1000 + Math.random() * 9000));
+
+  function limpiarValidacion() {
+    Object.values(fields).forEach((el) => el.classList.remove('invalid'));
+  }
+
+  function marcarInvalido(campo) {
+    fields[campo].classList.add('invalid');
+  }
+
+  function validarFormulario(data) {
+    let esValido = true;
+    limpiarValidacion();
+
+    if (!data.nombre) {
+      marcarInvalido('nombre');
+      esValido = false;
+    }
+
+    const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!data.correo || !correoRegex.test(data.correo)) {
+      marcarInvalido('correo');
+      esValido = false;
+    }
+
+    if (!data.item) {
+      marcarInvalido('item');
+      esValido = false;
+    }
+    
+    // Nueva validación para asegurar que la cantidad sea un número válido y mayor a 0
+    if (!data.cantidad || isNaN(data.cantidad) || data.cantidad < 1) {
+      marcarInvalido('cantidad');
+      esValido = false;
+    }
+
+    return esValido;
+  }
+
+  function mostrarEstado(tipo, titulo, mensaje) {
+    statusBox.className = 'status visible ' + tipo;
+    statusBox.innerHTML = '<strong>' + titulo + '</strong>' + mensaje;
+  }
+
+  function setCargando(cargando) {
+    submitBtn.disabled = cargando;
+    submitBtn.classList.toggle('loading', cargando);
+  }
+
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const datos = {
+      nombre: form.nombre.value.trim(),
+      correo: form.correo.value.trim(),
+      item: form.item.value,
+      cantidad: parseInt(form.cantidad.value, 10) // Capturamos la cantidad como número entero
+    };
+
+    if (!validarFormulario(datos)) {
+      mostrarEstado('error', 'Faltan datos', 'Revisa los campos marcados en rojo antes de enviar tu pedido.');
+      return;
+    }
+
+    setCargando(true);
+    statusBox.className = 'status';
+
+    try {
+      const respuesta = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await respuesta.json().catch(() => ({}));
+
+      if (respuesta.ok) {
+        mostrarEstado(
+          'success',
+          '¡Pedido recibido!',
+          'Gracias, ' + datos.nombre + '. Te enviaremos la confirmación a ' + datos.correo + '.'
+        );
+        form.reset();
+        limpiarValidacion();
+        orderNoLabel.textContent = 'PEDIDO Nº ' + String(Math.floor(1000 + Math.random() * 9000));
+      } else {
+        const detalle = resultado.error || 'No pudimos procesar tu pedido. Intenta de nuevo.';
+        mostrarEstado('error', 'Algo salió mal', detalle);
+      }
+    } catch (error) {
+      mostrarEstado(
+        'error',
+        'Sin conexión',
+        'No pudimos comunicarnos con el servidor. Verifica tu conexión e intenta otra vez.'
+      );
+    } finally {
+      setCargando(false);
+    }
+  });
+</script>
+
+</body>
+</html>
