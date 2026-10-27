@@ -6,12 +6,12 @@ from restaurante_db import crear_base_datos, guardar_pedido
 from enviar_correo import enviar_correo_confirmacion
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "https://5787800-oss.github.io"}})
+CORS(app)
 
 crear_base_datos()
 
 
-@app.route("/pedido", methods=["POST"])
+@app.route("/pedidos", methods=["POST"])
 def crear_pedido():
     data = request.get_json(silent=True)
 
