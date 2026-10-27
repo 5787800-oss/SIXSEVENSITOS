@@ -1,4 +1,3 @@
-import os 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -6,13 +5,21 @@ from restaurante_db import crear_base_datos, guardar_pedido
 from enviar_correo import enviar_correo_confirmacion
 
 app = Flask(__name__)
+# Permitimos peticiones desde cualquier origen (incluyendo GitHub Pages)
 CORS(app)
 
-crear_base_datos()
+# Intentar crear la tabla al arrancar
+try:
+    crear_base_datos()
+except Exception as e:
+    print(f"Advertencia al iniciar BD: {e}")
 
 
-@app.route("/pedidos", methods=["POST"])
+@app.route("/pedidos", methods=["POST", "OPTIONS"])
 def crear_pedido():
+    if request.method == "OPTIONS":
+        return "", 200
+
     data = request.get_json(silent=True)
 
     if not data:
@@ -20,7 +27,8 @@ def crear_pedido():
 
     nombre = (data.get("nombre") or "").strip()
     correo = (data.get("correo") or "").strip()
-    item = (data.get("item") or "").strip()
+    # Aceptamos tanto 'platillo' como 'item' para evitar fallos del frontend
+    item = (data.get("platillo") or data.get("item") or "").strip()
     cantidad_raw = data.get("cantidad")
 
     campos_faltantes = []
@@ -29,7 +37,7 @@ def crear_pedido():
     if not correo:
         campos_faltantes.append("correo")
     if not item:
-        campos_faltantes.append("item")
+        campos_faltantes.append("platillo/item")
     if cantidad_raw is None:
         campos_faltantes.append("cantidad")
 
@@ -59,7 +67,7 @@ def crear_pedido():
     )
 
     if pedido_id is None:
-        return jsonify({"error": "Ocurrió un error al guardar el pedido."}), 500
+        return jsonify({"error": "Ocurrió un error al guardar el pedido en la base de datos."}), 500
 
     item_con_cantidad = f"{cantidad}x {item}"
 
@@ -86,5 +94,4 @@ def crear_pedido():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True, port=5000)
